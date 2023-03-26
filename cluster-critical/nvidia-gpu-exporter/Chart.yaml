@@ -1,0 +1,7 @@
+name: nvidia-gpu-exporter
+apiVersion: v2
+version: 1.0.0
+dependencies:
+  - name: nvidia-gpu-exporter
+    version: 0.3.1
+    repository: https://utkuozdemir.org/helm-charts

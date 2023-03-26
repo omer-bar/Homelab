@@ -1,0 +1,115 @@
+cluster: "local"
+
+argo-cd:
+  fullnameOverride: argocd
+  installCRDs: true
+
+  global:
+    image:
+      repository: quay.io/argoproj/argocd
+      tag: ""
+
+  controller:
+    replicas: 2
+    enableStatefulSet: true
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+      rules:
+        enabled: true
+        spec:
+          - alert: ArgoAppMissing
+            expr: |
+              absent(argocd_app_info)
+            for: 15m
+            labels:
+              severity: critical
+            annotations:
+              summary: "[ArgoCD] No reported applications"
+              description: >
+                ArgoCD has not reported any applications data for the past 15 minutes which
+                means that it must be down or not functioning properly.  This needs to be
+                resolved for this cloud to continue to maintain state.
+          - alert: ArgoAppNotSynced
+            expr: |
+              argocd_app_info{sync_status!="Synced"} == 1
+            for: 12h
+            labels:
+              severity: warning
+            annotations:
+              summary: "[{{`{{$labels.name}}`}}] Application not synchronized"
+              description: >
+                The application [{{`{{$labels.name}}`}} has not been synchronized for over
+                12 hours which means that the state of this cloud has drifted away from the
+                state inside Git.
+
+  dex:
+    enabled: false
+
+  server:
+    configEnabled: true
+    extraArgs:
+      - --insecure # Run server without TLS
+    config:
+      admin.enabled: "true"
+      url: https://argocd.local.eryx.pro
+      application.instanceLabelKey: argocd.argoproj.io/instance
+      statusbadge.enabled: "true"
+      resource.compareoptions: |
+        ignoreAggregatedRoles: true
+      resource.customizations: |
+        admissionregistration.k8s.io/MutatingWebhookConfiguration:
+          ignoreDifferences: |
+            jsonPointers:
+              - /webhooks/0/clientConfig/caBundle
+        apiregistration.k8s.io/APIService:
+          ignoreDifferences: |
+            jsonPointers:
+              - /spec/caBundle
+              - /metadata/annotations
+        Service:
+          health.lua: |
+            hs = {}
+            hs.status = "Healthy"
+            return hs
+        networking.k8s.io/Ingress:
+          health.lua: |
+            hs = {}
+            hs.status = "Healthy"
+            return hs
+
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.priority: "10"
+        cert-manager.io/cluster-issuer: le-production
+      hosts:
+        - argocd.local.eryx.pro
+      tls:
+        - secretName: eryx-pro-tls
+          hosts: [argocd.local.eryx.pro]
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  repoServer:
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 75
+      targetMemoryUtilizationPercentage: 75
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+  applicationSet:
+    enabled: true
+    fullnameOverride: applicationset-controller
+
+    args:
+      policy: create-update

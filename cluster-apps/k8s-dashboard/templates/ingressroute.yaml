@@ -1,0 +1,32 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: ServersTransport
+metadata:
+  name: kubernetes-dashboard-transport
+  namespace: kubernetes-dashboard
+
+spec:
+  serverName: kubernetes-dashboard
+  insecureSkipVerify: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`{{ include "k8s.hostname" . }}`)
+      priority: 10
+      services:
+        - kind: Service
+          name: kubernetes-dashboard
+          namespace: kubernetes-dashboard
+          port: 443
+          serversTransport: kubernetes-dashboard-transport
+  tls:
+    secretName: {{ include "k8s.secretname" . }}

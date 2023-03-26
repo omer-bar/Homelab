@@ -1,0 +1,42 @@
+cluster: "local"
+
+kps:
+  fullnameOverride: kps
+  alertmanager:
+    fullnameOverride: alertmanager
+  prometheusOperator:
+    fullnameOverride: prometheus-operator
+    scrapeInterval: 15s
+    evaluationInterval: 15s
+  prometheus:
+    fullnameOverride: prometheus
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.priority: "10"
+        cert-manager.io/cluster-issuer: le-production
+      hosts:
+        - prometheus.local.eryx.pro
+      tls:
+        - secretName: eryx-pro-tls
+          hosts: [prometheus.local.eryx.pro]
+  kube-state-metrics:
+    fullnameOverride: kube-state-metrics
+  prometheus-node-exporter:
+    fullnameOverride: node-exporter
+  grafana:
+    fullnameOverride: grafana
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.priority: "10"
+        cert-manager.io/cluster-issuer: le-production
+      hosts:
+        - grafana.local.eryx.pro
+      tls:
+        - secretName: eryx-pro-tls
+          hosts: [grafana.local.eryx.pro]

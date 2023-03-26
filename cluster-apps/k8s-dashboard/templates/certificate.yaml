@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: local-eryx-pro
+  namespace: kubernetes-dashboard
+spec:
+  secretName: eryx-pro-tls
+  issuerRef:
+    name: le-production
+    kind: ClusterIssuer
+  commonName: "*.local.eryx.pro"
+  dnsNames:
+    - "local.eryx.pro"
+    - "*.local.eryx.pro"

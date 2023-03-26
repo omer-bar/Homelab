@@ -1,0 +1,32 @@
+secrets-store-csi-driver:
+  fullnameOverride: csi-secrets-store
+
+  linux:
+    image:
+      repository: registry.k8s.io/csi-secrets-store/driver
+      tag: v1.3.0
+      pullPolicy: IfNotPresent
+
+    registrarImage:
+      repository: registry.k8s.io/sig-storage/csi-node-driver-registrar
+      tag: v2.6.2
+      pullPolicy: IfNotPresent
+
+    livenessProbeImage:
+      repository: registry.k8s.io/sig-storage/livenessprobe
+      tag: v2.8.0
+      pullPolicy: IfNotPresent
+
+  logVerbosity: 0
+  logFormatJSON: false
+
+  rbac:
+    install: true
+
+  syncSecret:
+    enabled: true
+
+  enableSecretRotation: true
+  rotationPollInterval: "120s"
+  # label: secrets-store.csi.k8s.io/used: "true"
+  filteredWatchSecret: false

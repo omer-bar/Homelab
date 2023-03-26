@@ -1,0 +1,33 @@
+cluster: "local"
+
+vault:
+  server:
+    enabled: true
+    image:
+      repository: "vault"
+      tag: "1.12.0"
+      pullPolicy: IfNotPresent
+    ingress:
+      enabled: true
+      pathType: Prefix
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.priority: "10"
+        cert-manager.io/cluster-issuer: le-production
+      hosts:
+        - host: vault.local.eryx.pro
+          paths: [/]
+      tls:
+        - hosts: [vault.local.eryx.pro]
+          secretName: eryx-pro-tls
+    readinessProbe:
+      enabled: false
+  dataStorage:
+    storageClass: file
+  ui:
+    enabled: true
+  csi:
+    enabled: true
+  injector:
+    enabled: true

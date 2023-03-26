@@ -1,0 +1,27 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: uptime-dashboard
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: le
+    traefik.ingress.kubernetes.io/load-balancer.server.port: "3001"
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`{{ include "uptime.hostname" . }}`)
+      priority: 10
+      services:
+        - kind: Service
+          name: uptime-kuma
+          namespace: monitoring
+          port: 3001
+
+  tls:
+    secretName: {{ include "uptime.secretname" . }}

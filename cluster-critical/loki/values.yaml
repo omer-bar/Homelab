@@ -1,0 +1,12 @@
+cluster: "local"
+
+loki-stack:
+  fullnameOverride: loki-stack
+  loki:
+    fullnameOverride: loki
+    serviceMonitor:
+      enabled: true
+  promtail:
+    fullnameOverride: promtail
+    serviceMonitor:
+      enabled: true

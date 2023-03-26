@@ -6,7 +6,7 @@ curl -sfL https://get.k3s.io | sh -s - \
   --disable traefik
 
 # Agent setup command
-curl -sfL https://get.k3s.io | K3S_URL=https://<Master_Node>:6444 K3S_TOKEN=<Token> sh -
+curl -sfL https://get.k3s.io | K3S_URL=https://{{ master_node }}:6444 K3S_TOKEN={{ cluster_token }} sh -
 
 # Server delete command
 /usr/local/bin/k3s-uninstall.sh
@@ -18,16 +18,16 @@ curl -sfL https://get.k3s.io | K3S_URL=https://<Master_Node>:6444 K3S_TOKEN=<Tok
 /usr/local/bin/k3s-killall.sh
 
 # rollout restart command
-kubectl -n <Name_Space> rollout restart <Resource_Kind>
+kubectl -n {{ namespace }} rollout restart {{ resource_kind }}
 kubectl -n apps rollout restart daemonsets,deployments
 
 # label a node
-kubectl label node <Node> <Label>/<Key>=<Value>
+kubectl label node {{ node_name }} {{ label }}/{{ key }}={{ value }}
 kubectl label node pi.eryx.local node-role.kubernetes.io/worker=worker
 
 # remove label from node
-kubectl label node <Node> <Label>/<Key>-
+kubectl label node {{ node_name }} {{ label }}/{{ key }}-
 kubectl label node pi.eryx.local node-role.kubernetes.io/worker-
 
 # Debugging using ephemeral containers
-kubectl debug -it <Pod_Name> --image=<Debugging_Image> --target=<Container_Name>
+kubectl debug -it {{ pod_name }} --image={{ debugging_image }} --target={{ container_name }}

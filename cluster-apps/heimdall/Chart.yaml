@@ -3,5 +3,5 @@ apiVersion: v2
 version: 1.0.0
 dependencies:
   - name: heimdall
-    version: 8.5.2
+    version: 8.5.4
     repository: https://djjudas21.github.io/charts/

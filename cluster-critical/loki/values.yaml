@@ -4,6 +4,7 @@ loki-stack:
   fullnameOverride: loki-stack
   loki:
     fullnameOverride: loki
+    auth_enabled: false
     serviceMonitor:
       enabled: true
   promtail:

@@ -9,6 +9,10 @@ loki-stack:
       enabled: true
   promtail:
     fullnameOverride: promtail
+    securityContext:
+      runAsUser: 0
+      runAsGroup: 0
+      fsGroup: 0
     serviceMonitor:
       enabled: true
     config:

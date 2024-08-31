@@ -10,31 +10,31 @@ metadata:
     name: loki
     namespace: monitoring
 spec:
-    rules:
-        - host: loki.local.eryx.pro
-          http:
-              paths:
-                  - path: /ready
-                    pathType: Prefix
-                    backend:
-                        service:
-                            name: loki
-                            port:
-                                number: 3100
-                  - path: /metrics
-                    pathType: Prefix
-                    backend:
-                        service:
-                            name: loki
-                            port:
-                                number: 3100
-                  - path: /loki
-                    pathType: Prefix
-                    backend:
-                        service:
-                            name: loki
-                            port:
-                                number: 3100
+  rules:
+    - host: loki.local.eryx.pro
+      http:
+        paths:
+          - path: /ready
+            pathType: Prefix
+            backend:
+              service:
+                name: loki
+                port:
+                  number: 3100
+          - path: /metrics
+            pathType: Prefix
+            backend:
+              service:
+                name: loki
+                port:
+                  number: 3100
+          - path: /loki/api/v1
+            pathType: Prefix
+            backend:
+              service:
+                name: loki
+                port:
+                  number: 3100
     tls:
         - secretName: eryx-pro-tls
           hosts: [loki.local.eryx.pro]

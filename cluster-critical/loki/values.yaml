@@ -10,9 +10,14 @@ loki-stack:
   promtail:
     fullnameOverride: promtail
     securityContext:
+      allowPrivilegeEscalation: true
+    capabilities:
+      add:
+        - SYS_ADMIN
       runAsUser: 0
       runAsGroup: 0
       fsGroup: 0
+    privileged: true
     serviceMonitor:
       enabled: true
     config:

@@ -1,0 +1,32 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: ServersTransport
+metadata:
+  name: grafana-dashboard-transport
+  namespace: monitoring
+
+spec:
+  serverName: grafana-dashboard
+  insecureSkipVerify: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grafana-dashboard
+  namespace: monitoring
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`{{ include "grafana.hostname" . }}`)
+      priority: 10
+      services:
+        - kind: Service
+          name: grafana
+          namespace: monitoring
+          port: 80
+          serversTransport: grafana-dashboard-transport
+  tls:
+    secretName: {{ include "grafana.secretname" . }}

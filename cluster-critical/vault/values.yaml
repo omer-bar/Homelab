@@ -1,0 +1,19 @@
+cluster: "local"
+
+vault:
+  server:
+    enabled: true
+    image:
+      repository: "vault"
+      tag: "1.13.3"
+      pullPolicy: IfNotPresent
+    readinessProbe:
+      enabled: false
+  dataStorage:
+    storageClass: file
+  ui:
+    enabled: true
+  csi:
+    enabled: true
+  injector:
+    enabled: true

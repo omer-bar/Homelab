@@ -1,0 +1,51 @@
+cluster: "local"
+
+loki-stack:
+  fullnameOverride: loki-stack
+  loki:
+    fullnameOverride: loki
+    auth_enabled: false
+    serviceMonitor:
+      enabled: true
+  promtail:
+    fullnameOverride: promtail
+    containers:
+      securityContext:
+        allowPrivilegeEscalation: true
+        capabilities:
+          add:
+            - SYS_ADMIN
+          runAsUser: 0
+          runAsGroup: 0
+          fsGroup: 0
+        privileged: true
+    serviceMonitor:
+      enabled: true
+    config:
+      server:
+        http_listen_port: 9080
+        grpc_listen_port: 0
+
+      positions:
+        filename: /tmp/positions.yaml
+
+      clients:
+        - url: http://10.43.173.242:3100/loki/api/v1/push
+
+      scrape_configs:
+        - job_name: system
+          static_configs:
+            - targets:
+                - localhost
+              labels:
+                job: varlogs
+                __path__: /var/log/**/*
+
+    extraVolumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+    extraVolumeMounts:
+      - name: varlog
+        mountPath: /var/log
+        readOnly: true

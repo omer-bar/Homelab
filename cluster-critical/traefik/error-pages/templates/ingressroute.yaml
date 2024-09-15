@@ -1,0 +1,21 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: error-pages
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: HostRegexp(`{host:.+}`)
+      priority: 1
+      services:
+        - kind: Service
+          name: error-pages
+          port: 8080
+  tls:
+    {{- if eq .Values.env.TEMPLATE_NAME "l7-dark" }}
+    secretName: wc-cajun-pro
+    {{- else }}
+    secretName: wc-nickflix-io
+    {{- end }}

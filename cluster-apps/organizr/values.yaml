@@ -1,0 +1,36 @@
+global:
+  domainName: "local.eryx.pro"
+
+organizr:
+  image:
+    repository: organizr/organizr
+    tag: latest
+    pullPolicy: Always
+  fullnameOverride: organizr
+  enableServiceLinks: false
+  env:
+    TZ: "Asia/Jerusalem"
+    PUID: "1001"
+    PGID: "1001"
+  ingress:
+    main:
+      enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.priority: "5"
+        cert-manager.io/cluster-issuer: le-production
+      hosts:
+        - host: "{{ .Values.global.domainName }}"
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts: ["{{ .Values.global.domainName }}"]
+          secretName: '{{ .Values.global.domainName | replace "." "-" }}'
+  persistence:
+    config:
+      enabled: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128m

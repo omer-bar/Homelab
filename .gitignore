@@ -1,0 +1,10 @@
+# helm charts
+charts/
+Chart.lock
+testchart/
+*.tgz
+
+# Folders
+cluster-info/
+.vscode/
+.archive/

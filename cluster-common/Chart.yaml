@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cluster-common
+description: A Helm chart with shared template helpers for the cluster
+type: library
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,15 +1,13 @@
----
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: local-eryx-pro
-  namespace: vault
+  name: {{ .Release.Name }}-cert
+  namespace: {{ .Release.Namespace }}
 spec:
-  secretName: eryx-pro-tls
+  secretName: {{ include "cluster-common.secretName" . }}
   issuerRef:
     name: le-production
     kind: ClusterIssuer
-  commonName: "*.local.eryx.pro"
+  commonName: {{ include "cluster-common.hostname" . }}
   dnsNames:
-    - "local.eryx.pro"
-    - "*.local.eryx.pro"
+    - {{ include "cluster-common.hostname" . }}

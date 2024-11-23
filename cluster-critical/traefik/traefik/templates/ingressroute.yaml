@@ -1,22 +1,21 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-    name: {{ include "cluster-common.hostname" . }}
-    annotations:
-        kubernetes.io/ingress.class: traefik
-        cert-manager.io/cluster-issuer: le-production
+  name: traefik-dashboard
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    kubernetes.io/ingress.class: traefik
 spec:
-    entryPoints:
-        - websecure
-    routes:
-        - kind: Rule
-          match: Host(`{{ include "cluster-common.hostname" . }}`)
-          middlewares:
-              - name: traefik-dashboard-basicauth
-                namespace: traefik
-          priority: 10
-          services:
-              - kind: TraefikService
-                name: api@internal
-    tls:
-        secretName: {{ include "cluster-common.secretName" . }}
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`{{ include "cluster-common.hostname" . }}`)
+      middlewares:
+        - name: traefik-dashboard-basicauth
+          namespace: traefik
+      services:
+        - kind: TraefikService
+          name: api@internal
+  tls:
+    secretName: {{ include "cluster-common.secretName" . }}

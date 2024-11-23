@@ -1,15 +1,15 @@
----
+# argocd/certificate.yaml
+{{- $hostname := include "argocd.hostname" . -}}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: local-eryx-pro
+  name: argocd-cert
   namespace: argocd
 spec:
-  secretName: eryx-pro-tls
+  secretName: {{ include "argocd.secretname" . }}
   issuerRef:
     name: le-production
     kind: ClusterIssuer
-  commonName: "*.local.eryx.pro"
+  commonName: {{ $hostname }}
   dnsNames:
-    - "local.eryx.pro"
-    - "*.local.eryx.pro"
+    - {{ $hostname }}

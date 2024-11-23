@@ -2,6 +2,6 @@
   {{- printf "vault.%s.eryx.pro" .Values.cluster -}}
 {{- end -}}
 
-{{- define "vault.secretname" -}}
-  {{- "eryx-pro-tls" -}}
+{{- define "vault.secretName" -}}
+  {{- printf "vault-tls" -}}
 {{- end -}}

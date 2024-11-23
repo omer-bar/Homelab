@@ -50,6 +50,9 @@ traefik:
   experimental:
     plugins:
       enabled: true
+      pluginConfiguration:
+        moduleName: traefik/plugin-rewritebody
+        version: v0.4.0
   rollingUpdate:
     maxUnavailable: 3
     maxSurge: 3

@@ -18,7 +18,7 @@ spec:
         - name: argo-cd-argocd-server
           port: 80
     - kind: Rule
-      match: Host(`{{ include "argocd.hostname" . }}`) && Headers(`Content-Type`, `application/grpc`)
+      match: Host(`argocd.local.eryx.pro`) && PathPrefix(`/`)
       priority: 11
       services:
         - name: argocd-server

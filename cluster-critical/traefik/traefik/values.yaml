@@ -73,9 +73,6 @@ traefik:
     isDefaultClass: true
   pilot:
     enabled: false
-  experimental:
-    plugins:
-      enabled: false
   rollingUpdate:
     maxUnavailable: 3
     maxSurge: 3

@@ -38,7 +38,7 @@ traefik:
         default: true
       exposedPort: 80
       redirectTo:
-        entryPoint: websecure
+        port: websecure
     websecure:
       port: 8443
       expose:

@@ -3,7 +3,7 @@ cluster: "local"
 traefik:
   fullnameOverride: traefik
   image:
-    name: traefik
+    repository: traefik
     tag: 3.1.1
   deployment:
     annotations:
@@ -14,7 +14,6 @@ traefik:
     - "--providers.kubernetesingress.ingressclass=traefik"
     - "--metrics.prometheus=true"
     - "--metrics.prometheus.entryPoint=metrics"
-    # - "--entrypoints.websecure.http.middlewares=ingress-error-pages@kubernetescrd"
   logs:
     general:
       format: json
@@ -23,36 +22,60 @@ traefik:
       enabled: true
       format: json
   service:
+    enabled: true
+    type: LoadBalancer
     spec:
       externalTrafficPolicy: Local
   ports:
+    traefik:
+      port: 8080
+      expose:
+        default: false
+      exposedPort: 8080
     web:
-      redirectTo: websecure
+      port: 8000
+      expose:
+        default: true
+      exposedPort: 80
+      redirectTo:
+        entryPoint: websecure
     websecure:
+      port: 8443
+      expose:
+        default: true
+      exposedPort: 443
       tls:
         enabled: true
+    metrics:
+      port: 8082
+      expose:
+        default: true
+      exposedPort: 8082
   metrics:
-    port: 8082
-    expose:
-      enabled: true
-      default: true
-    exposedPort: 8082
-
+    prometheus:
+      entryPoint: metrics
+      addEntryPointsLabels: true
+      addServicesLabels: true
+      addRoutersLabels: false
+      buckets: "0.1,0.3,1.2,5.0"
   ingressRoute:
     dashboard:
       enabled: true
+      matchRule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      services:
+        - name: api@internal
+          kind: TraefikService
+      entryPoints: ["traefik"]
+      tls:
+        enabled: true
   ingressClass:
     enabled: true
     isDefaultClass: true
-    fallbackApiVersion: v1
   pilot:
-    enabled: true
+    enabled: false
   experimental:
     plugins:
-      enabled: true
-      pluginConfiguration:
-        moduleName: traefik/plugin-rewritebody
-        version: v0.4.0
+      enabled: false
   rollingUpdate:
     maxUnavailable: 3
     maxSurge: 3

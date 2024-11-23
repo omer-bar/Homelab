@@ -19,5 +19,4 @@ spec:
               - kind: TraefikService
                 name: api@internal
     tls:
-        enabled: true
         secretName: {{ include "cluster-common.secretName" . }}

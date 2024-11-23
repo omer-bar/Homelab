@@ -31,10 +31,13 @@ traefik:
     websecure:
       tls:
         enabled: true
-    metrics:
-      port: 8082
-      expose: true
-      exposedPort: 8082
+  metrics:
+    port: 8082
+    expose:
+      enabled: true
+      default: true
+    exposedPort: 8082
+
   ingressRoute:
     dashboard:
       enabled: true

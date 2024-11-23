@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  cluster-common:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-11-23T14:01:09.734180464+02:00"
+    description: A Helm chart with shared template helpers for the cluster
+    digest: 36429300cb0c8437a0d49f7e59390df6760812e45b68c44627c0cadb7c9eab57
+    name: cluster-common
+    type: library
+    urls:
+    - https://omer-bar.github.io/Homelab/charts/cluster-common-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-11-23T14:01:09.73400283+02:00"

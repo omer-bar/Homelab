@@ -7,4 +7,4 @@ dependencies:
     repository: https://helm.traefik.io/traefik
   - name: cluster-common
     version: "0.1.0"
-    repository: "file://../../../../cluster-common"
+    repository: "https://omer-bar.github.io/Homelab/charts/"

@@ -61,13 +61,6 @@ traefik:
   ingressRoute:
     dashboard:
       enabled: true
-      matchRule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
-      services:
-        - name: api@internal
-          kind: TraefikService
-      entryPoints: ["traefik"]
-      tls:
-        enabled: true
   ingressClass:
     enabled: true
     isDefaultClass: true

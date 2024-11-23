@@ -8,3 +8,6 @@ testchart/
 cluster-info/
 .vscode/
 .archive/
+
+# Files
+vault-cluster-keys.json

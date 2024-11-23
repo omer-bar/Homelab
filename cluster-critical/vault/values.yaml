@@ -9,8 +9,7 @@ vault:
       pullPolicy: IfNotPresent
     readinessProbe:
       enabled: false
-    extraArgs:
-      - "--tls-skip-verify"
+    extraArgs: "--tls-skip-verify"
   dataStorage:
     storageClass: file
   ui:

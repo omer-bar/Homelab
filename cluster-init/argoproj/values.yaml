@@ -78,6 +78,20 @@ argo-cd:
             hs = {}
             hs.status = "Healthy"
             return hs
+        # Add CRD customization for large resources
+        apiextensions.k8s.io/CustomResourceDefinition:
+          ignoreDifferences: |
+            jsonPointers:
+              - /metadata/annotations
+
+    configs:
+      params:
+        # Enable server-side apply globally
+        server.default.server.side.apply: true
+        # Increase resource limits
+        resource.limits.memory: "2048Mi"
+        # Add timeout for applying resources
+        timeout.reconciliation: "180s"
 
     ingress:
       enabled: false
@@ -95,6 +109,7 @@ argo-cd:
       enabled: true
       serviceMonitor:
         enabled: true
+
   repoServer:
     autoscaling:
       enabled: true
@@ -102,6 +117,14 @@ argo-cd:
       maxReplicas: 10
       targetCPUUtilizationPercentage: 75
       targetMemoryUtilizationPercentage: 75
+    # Add resource limits for repo server
+    resources:
+      limits:
+        memory: "2048Mi"
+        cpu: "1000m"
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
     metrics:
       enabled: true
       serviceMonitor:
@@ -110,6 +133,5 @@ argo-cd:
   applicationSet:
     enabled: true
     fullnameOverride: applicationset-controller
-
     args:
       policy: create-update

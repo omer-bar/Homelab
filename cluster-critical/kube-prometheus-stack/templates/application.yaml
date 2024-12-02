@@ -6,21 +6,21 @@ metadata:
   annotations:
     link.argocd.argoproj.io/prometheus: https://prometheus.{{ .Values.cluster }}.eryx.pro
     link.argocd.argoproj.io/grafana: https://grafana.{{ .Values.cluster }}.eryx.pro
+    argocd.argoproj.io/sync-options: ServerSideApply=true
 spec:
   destination:
     namespace: monitoring
     server: https://kubernetes.default.svc
   source:
-    path: cluster-critical/kube-prometheus-stack
+    path: cluster-critical/kube-prometheus-stack  # Update this to your actual path
     repoURL: https://github.com/omer-bar/Homelab
     targetRevision: HEAD
-    helm:
-      skipCrds: true  # Skip CRDs here as they're handled by the CRD application
   project: default
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - Replace=true
     automated:
       prune: true
       selfHeal: true

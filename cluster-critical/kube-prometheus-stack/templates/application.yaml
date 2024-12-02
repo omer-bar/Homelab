@@ -11,7 +11,7 @@ spec:
     namespace: monitoring
     server: https://kubernetes.default.svc
   source:
-    path: path/to/kube-prometheus-stack
+    path: cluster-critical/kube-prometheus-stack
     repoURL: https://github.com/omer-bar/Homelab
     targetRevision: HEAD
     helm:

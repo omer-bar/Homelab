@@ -30,7 +30,3 @@ kps:
     fullnameOverride: grafana
     ingress:
       enabled: false
-    admin:
-      existingSecret: "grafana-admin-secret"
-      userKey: admin
-      passwordKey: password

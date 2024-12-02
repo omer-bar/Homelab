@@ -6,3 +6,6 @@ dependencies:
     version: 66.2.2
     repository: https://prometheus-community.github.io/helm-charts
     alias: kps
+  - name: cluster-common
+    version: "0.1.0"
+    repository: "https://omer-bar.github.io/Homelab/charts/"

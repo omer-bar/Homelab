@@ -1,32 +1,16 @@
----
-apiVersion: traefik.io/v1alpha1
-kind: ServersTransport
-metadata:
-  name: grafana-dashboard-transport
-  namespace: monitoring
-
-spec:
-  serverName: grafana-dashboard
-  insecureSkipVerify: true
-
----
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: grafana-dashboard
-  namespace: monitoring
+  namespace: {{ .Release.Namespace }}
 spec:
   entryPoints:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`{{ include "grafana.hostname" . }}`)
-      priority: 10
+      match: Host(`{{ include "cluster-common.hostname" . }}`)
       services:
-        - kind: Service
-          name: grafana
-          namespace: monitoring
+        - name: grafana
           port: 80
-          serversTransport: grafana-dashboard-transport
   tls:
-    secretName: {{ include "grafana.secretname" . }}
+    secretName: {{ include "cluster-common.secretName" . }}

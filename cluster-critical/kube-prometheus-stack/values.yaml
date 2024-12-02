@@ -8,6 +8,7 @@ kps:
   fullnameOverride: kps
   alertmanager:
     fullnameOverride: alertmanager
+  version: "66.2.2"
 
   prometheusOperator:
     fullnameOverride: prometheus-operator
@@ -17,7 +18,7 @@ kps:
   prometheus:
     fullnameOverride: prometheus
     ingress:
-      enabled: false  # We'll use IngressRoute instead
+      enabled: false
 
   kube-state-metrics:
     fullnameOverride: kube-state-metrics
@@ -28,7 +29,7 @@ kps:
   grafana:
     fullnameOverride: grafana
     ingress:
-      enabled: false  # We'll use IngressRoute instead
+      enabled: false
     admin:
       existingSecret: "grafana-admin-secret"
       userKey: admin

@@ -11,11 +11,15 @@ spec:
     namespace: monitoring
     server: https://kubernetes.default.svc
   source:
-    path: cluster-critical/kube-prometheus-stack
+    path: path/to/kube-prometheus-stack
     repoURL: https://github.com/omer-bar/Homelab
     targetRevision: HEAD
+    helm:
+      skipCrds: true  # Skip CRDs here as they're handled by the CRD application
+  project: default
   syncPolicy:
     syncOptions:
+      - CreateNamespace=true
       - ServerSideApply=true
     automated:
       prune: true

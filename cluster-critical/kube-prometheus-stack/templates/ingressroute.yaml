@@ -1,16 +1,37 @@
+# grafana-ingressroute.yaml
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: grafana-dashboard
+  name: grafana
   namespace: {{ .Release.Namespace }}
 spec:
   entryPoints:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`{{ include "cluster-common.hostname" . }}`)
+      match: Host(`grafana.local.eryx.pro`)
       services:
         - name: grafana
           port: 80
+  tls:
+    secretName: {{ include "cluster-common.secretName" . }}
+
+---
+
+# prometheus-ingressroute.yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus
+  namespace: {{ .Release.Namespace }}
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`prometheus.local.eryx.pro`)
+      services:
+        - name: prometheus-operated
+          port: 9090
   tls:
     secretName: {{ include "cluster-common.secretName" . }}

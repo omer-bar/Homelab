@@ -11,22 +11,49 @@ loki-stack:
     fullnameOverride: promtail
     daemonset:
       enabled: true
-    config:
-      server:
-        http_listen_port: 9080
-        grpc_listen_port: 0
-      clients:
-        - url: http://loki.local.eryx.pro/loki/api/v1/push
-      positions:
-        filename: /tmp/positions.yaml
-      scrape_configs:
-        - job_name: nodes
-          static_configs:
-            - targets:
-                - localhost
-              labels:
-                job: system-logs
-                __path__: /var/log/**/*.log
+      podSpec:
+        securityContext:
+          fsGroup: 2000  # Adjust according to your needs
+        containers:
+          - name: promtail
+            securityContext:
+              capabilities:
+                add: ["SYS_RESOURCE"]
+            resources:
+              limits:
+                memory: "512Mi"
+                cpu: "1"
+              requests:
+                memory: "256Mi"
+                cpu: "500m"
+        initContainers:
+          - name: set-ulimit
+            image: busybox
+            command:
+              - sh
+              - -c
+              - "ulimit -n 65535"
+            securityContext:
+              privileged: true
+            volumeMounts:
+              - name: varlog
+                mountPath: /var/log
+      config:
+        server:
+          http_listen_port: 9080
+          grpc_listen_port: 0
+        clients:
+          - url: http://loki.local.eryx.pro/loki/api/v1/push
+        positions:
+          filename: /tmp/positions.yaml
+        scrape_configs:
+          - job_name: nodes
+            static_configs:
+              - targets:
+                  - localhost
+                labels:
+                  job: system-logs
+                  __path__: /var/log/**/*.log
 
     serviceMonitor:
       enabled: true

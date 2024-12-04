@@ -11,33 +11,15 @@ loki-stack:
     fullnameOverride: promtail
     daemonset:
       enabled: true
-      podSpec:
-        securityContext:
-          fsGroup: 2000  # Adjust according to your needs
-        containers:
-          - name: promtail
-            securityContext:
-              capabilities:
-                add: ["SYS_RESOURCE"]
-            resources:
-              limits:
-                memory: "512Mi"
-                cpu: "1"
-              requests:
-                memory: "256Mi"
-                cpu: "500m"
-        initContainers:
-          - name: set-ulimit
-            image: busybox
-            command:
-              - sh
-              - -c
-              - "ulimit -n 65535"
-            securityContext:
-              privileged: true
-            volumeMounts:
-              - name: varlog
-                mountPath: /var/log
+      initContainers:
+        - name: set-ulimit
+          image: busybox:latest
+          command: ["/bin/sh", "-c", "ulimit -n 65536; echo 'ulimit updated'"]
+          securityContext:
+            privileged: true
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
       config:
         server:
           http_listen_port: 9080
@@ -54,14 +36,12 @@ loki-stack:
                 labels:
                   job: system-logs
                   __path__: /var/log/**/*.log
+      extraVolumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+      extraVolumeMounts:
+        - name: varlog
+          mountPath: /var/log
+          readOnly: true
 
-    serviceMonitor:
-      enabled: true
-    extraVolumes:
-      - name: varlog
-        hostPath:
-          path: /var/log
-    extraVolumeMounts:
-      - name: varlog
-        mountPath: /var/log
-        readOnly: true

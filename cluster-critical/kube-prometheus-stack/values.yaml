@@ -14,6 +14,10 @@ kps:
     fullnameOverride: prometheus-operator
     scrapeInterval: 15s
     evaluationInterval: 15s
+    tls:
+        enabled: true
+    admissionWebhooks:
+        enabled: true
 
   prometheus:
     fullnameOverride: prometheus

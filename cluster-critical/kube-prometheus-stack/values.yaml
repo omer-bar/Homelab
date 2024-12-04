@@ -34,3 +34,17 @@ kps:
     fullnameOverride: grafana
     ingress:
       enabled: false
+    adminPassword: ""
+    envFromSecret: "grafana-admin-secret"
+
+    grafana.ini:
+        security:
+        admin_user: admin
+        admin_password: "$GRAFANA_ADMIN_PASSWORD"
+
+    extraSecretMounts:
+        - name: grafana-admin-secret
+          secretName: grafana-admin-secret
+          defaultMode: 0440
+          mountPath: /etc/secrets/grafana
+          readOnly: true

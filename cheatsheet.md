@@ -1,8 +1,18 @@
 # Server setup command
-curl -sfL https://get.k3s.io | sh -s - \
+curl -sfL https://get.k3s.io | sh -s - server \
+  --datastore-endpoint='postgres://k3s:<PASSWORD>@<POSTGRESQL_MACHINE_IP>:5432/k3s' \
   --https-listen-port=6444 \
   --lb-server-port=6444 \
   --write-kubeconfig-mode=644 \
+  --disable traefik
+
+# 2nd Server setup command
+curl -sfL https://get.k3s.io | sh -s - server \
+  --datastore-endpoint='postgres://k3s:<PASSWORD>@<POSTGRESQL_MACHINE_IP>:5432/k3s' \
+  --https-listen-port=6444 \
+  --lb-server-port=6444 \
+  --server https://192.168.50.2:6444 \
+  --token=<TOKEN> \
   --disable traefik
 
 # Agent setup command

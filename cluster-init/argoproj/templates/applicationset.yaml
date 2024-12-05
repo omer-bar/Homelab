@@ -39,17 +39,17 @@ spec:
 
   template:
     metadata:
-      name: '{{name}}'
+      name: "{{ `{{name}}` }}"
       namespace: argocd
     spec:
       project: default
       source:
         repoURL: https://github.com/omer-bar/Homelab
         targetRevision: main
-        path: '{{path}}'
+        path: "{{ `{{path}}` }}"
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{namespace}}'
+        namespace: "{{ `{{namespace}}` }}"
       syncPolicy:
         automated:
           prune: true

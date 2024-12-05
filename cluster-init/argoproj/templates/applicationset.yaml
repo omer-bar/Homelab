@@ -48,6 +48,8 @@ spec:
     metadata:
       name: "{{ `{{name}}` }}"
       namespace: argocd
+      annotations:
+        argocd.argoproj.io/sync-wave: "{{ `{{wave}}` }}"
     spec:
       project: default
       source:

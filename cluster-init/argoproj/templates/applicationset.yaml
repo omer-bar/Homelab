@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-bootstrap
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          # Self-manage ArgoCD
+          - name: argocd
+            path: cluster-init/argoproj
+            namespace: argocd
+
+          # Critical Infrastructure
+          - name: traefik
+            path: cluster-critical/traefik
+            namespace: traefik
+
+          - name: cert-manager
+            path: cluster-critical/cert-manager
+            namespace: cert-manager
+
+          - name: vault
+            path: cluster-critical/vault
+            namespace: vault
+
+          - name: secret-store-csi-driver
+            path: cluster-critical/secret-store-csi-driver
+            namespace: secret-store-csi
+
+          - name: kube-prometheus-stack
+            path: cluster-critical/kube-prometheus-stack
+            namespace: monitoring
+
+          - name: loki
+            path: cluster-critical/loki
+            namespace: monitoring
+
+  template:
+    metadata:
+      name: '{{name}}'
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/omer-bar/Homelab
+        targetRevision: main
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

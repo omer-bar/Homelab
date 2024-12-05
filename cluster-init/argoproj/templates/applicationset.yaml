@@ -11,38 +11,38 @@ spec:
           - name: argocd
             path: cluster-init/argoproj
             namespace: argocd
-            wave: 2
+            wave: "2"
 
           # Critical Infrastructure
           - name: traefik
             path: cluster-critical/traefik/traefik
             namespace: traefik
-            wave: 1
+            wave: "1"
 
           - name: cert-manager
             path: cluster-critical/cert-manager
             namespace: cert-manager
-            wave: 1
+            wave: "1"
 
           - name: vault
             path: cluster-critical/vault
             namespace: vault
-            wave: 3
+            wave: "3"
 
           - name: secret-store-csi-driver
             path: cluster-critical/secret-store-csi-driver
             namespace: secret-store-csi
-            wave: 3
-            
+            wave: "3"
+
           - name: kube-prometheus-stack
             path: cluster-critical/kube-prometheus-stack
             namespace: monitoring
-            wave: 3
+            wave: "3"
 
           - name: loki
             path: cluster-critical/loki
             namespace: monitoring
-            wave: 3
+            wave: "3"
 
   template:
     metadata:

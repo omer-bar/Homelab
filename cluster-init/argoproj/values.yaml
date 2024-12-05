@@ -10,8 +10,18 @@ argo-cd:
       tag: ""
 
   controller:
-    replicas: 2
+    replicas: 3
     enableStatefulSet: true
+    env:
+      - name: ARGOCD_CONTROLLER_REPLICAS
+        value: "3"
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: argocd-application-controller
+            topologyKey: kubernetes.io/hostname
     metrics:
       enabled: true
       serviceMonitor:
@@ -43,11 +53,23 @@ argo-cd:
                 The application [{{`{{$labels.name}}`}} has not been synchronized for over
                 12 hours which means that the state of this cloud has drifted away from the
                 state inside Git.
+    persistence:
+      enabled: true
+      storageClass: local-path
 
   dex:
     enabled: false
 
   server:
+    replicas: 2
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: argocd-server
+            topologyKey: kubernetes.io/hostname
+
     configEnabled: true
     extraArgs:
       - --insecure # Run server without TLS
@@ -135,3 +157,14 @@ argo-cd:
     fullnameOverride: applicationset-controller
     args:
       policy: create-update
+  redis:
+    enabled: true
+    ha:
+      enabled: true
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: argocd-redis
+            topologyKey: kubernetes.io/hostname

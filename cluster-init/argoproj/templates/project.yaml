@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: Homelab
+  name: homelab
   namespace: argocd
 spec:
   description: Default Homelab project

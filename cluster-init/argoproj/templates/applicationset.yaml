@@ -14,7 +14,7 @@ spec:
 
           # Critical Infrastructure
           - name: traefik
-            path: cluster-critical/traefik
+            path: cluster-critical/traefik/traefik
             namespace: traefik
 
           - name: cert-manager

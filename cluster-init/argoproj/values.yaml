@@ -81,6 +81,17 @@ argo-cd:
       admin.enabled: "true"
       url: https://argocd.local.eryx.pro
       application.instanceLabelKey: argocd.argoproj.io/instance
+      web.secure: "true"
+      # Add CORS configuration
+      ui.bannercontent: ""
+      ui.bannerpermanent: "false"
+      ga.trackingid: ""
+      admin.globalprojects: ""
+      exec.enabled: "false"
+      server.rbac.log.enforce.enable: "false"
+      server.cors.enable: "true"
+      server.cors.allowOrigins: "*"
+      server.cors.allowCredentials: "true"
       statusbadge.enabled: "true"
       resource.compareoptions: |
         ignoreAggregatedRoles: true

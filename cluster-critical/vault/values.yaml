@@ -85,7 +85,7 @@ vault:
     enabled: true
     image:
       repository: "hashicorp/vault-csi-provider"
-      tag: "1.4.0"
+      tag: "1.5.0"
 
   injector:
     enabled: true

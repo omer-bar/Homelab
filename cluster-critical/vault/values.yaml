@@ -7,12 +7,12 @@ vault:
       repository: "vault"
       tag: "1.13.3"
       pullPolicy: IfNotPresent
-    
+
     readinessProbe:
       enabled: true
       initialDelaySeconds: 5
       periodSeconds: 5
-    
+
     livenessProbe:
       enabled: true
       path: "/v1/sys/health?standbyok=true"
@@ -22,7 +22,7 @@ vault:
     extraEnvironmentVars:
       VAULT_SKIP_VERIFY: "true"
       VAULT_ADDR: "http://127.0.0.1:8200"
-    
+
     standalone:
       enabled: true
       config: |
@@ -35,7 +35,6 @@ vault:
         storage "file" {
           path = "/vault/data"
         }
-        service_registration "kubernetes" {}
 
     resources:
       requests:

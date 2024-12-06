@@ -50,7 +50,7 @@ spec:
               path "secret/data/cert-manager/*" {
                 capabilities = ["read"]
               }
-EOF
+            EOF
             fi
             
             # Create "csi-secrets-store" Kubernetes role

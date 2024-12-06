@@ -78,20 +78,28 @@ argo-cd:
     extraArgs:
       - --insecure # Run server without TLS
     config:
-      admin.enabled: "true"
+      admin:
+        enabled: "true"
+        globalprojects: ""
       url: https://argocd.local.eryx.pro
       application.instanceLabelKey: argocd.argoproj.io/instance
       web.secure: "true"
       # Add CORS configuration
-      ui.bannercontent: ""
-      ui.bannerpermanent: "false"
-      ga.trackingid: ""
-      admin.globalprojects: ""
-      exec.enabled: "false"
-      server.rbac.log.enforce.enable: "false"
-      server.cors.enable: "true"
-      server.cors.allowOrigins: "*"
-      server.cors.allowCredentials: "true"
+      ui:
+        bannercontent: ""
+        bannerpermanent: "false"
+      ga:
+        trackingid: ""
+      exec:
+        enabled: "false"
+      rbac:
+        log:
+          enforce:
+            enable: "false"
+      cors:
+        enable: "true"
+        allowOrigins: "*"
+        allowCredentials: "true"
       statusbadge.enabled: "true"
       resource.compareoptions: |
         ignoreAggregatedRoles: true

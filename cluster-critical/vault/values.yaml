@@ -7,11 +7,54 @@ vault:
       repository: "vault"
       tag: "1.13.3"
       pullPolicy: IfNotPresent
+    
     readinessProbe:
-      enabled: false
-    extraArgs: >
-      --tls-skip-verify
-      --enable-auth=kubernetes
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    
+    livenessProbe:
+      enabled: true
+      path: "/v1/sys/health?standbyok=true"
+      initialDelaySeconds: 60
+      periodSeconds: 10
+
+    extraEnvironmentVars:
+      VAULT_SKIP_VERIFY: "true"
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    
+    standalone:
+      enabled: true
+      config: |
+        ui = true
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+        storage "file" {
+          path = "/vault/data"
+        }
+        service_registration "kubernetes" {}
+
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: vault
+            topologyKey: kubernetes.io/hostname
+
   auth:
     kubernetes:
       enabled: true
@@ -19,17 +62,45 @@ vault:
         token_reviewer_jwt_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         kubernetes_host: https://kubernetes.default.svc
         kubernetes_ca_cert_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
   policies:
     - name: cert-manager
       rules: |
         path "secret/data/cert-manager/*" {
           capabilities = ["read"]
         }
+
   dataStorage:
-    storageClass: file
+    enabled: true
+    size: "10Gi"
+    storageClass: "local-path"
+    accessMode: ReadWriteOnce
+
   ui:
     enabled: true
+    serviceType: ClusterIP
+    externalPort: 8200
+
   csi:
     enabled: true
+    image:
+      repository: "hashicorp/vault-csi-provider"
+      tag: "1.4.0"
+
   injector:
     enabled: true
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+  serviceAccount:
+    create: true
+    annotations: {}
+
+  global:
+    enabled: true
+    tlsDisable: true

@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-init
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    spec:
+      serviceAccountName: vault
+      containers:
+      - name: vault-init
+        image: vault:1.13.3
+        command:
+        - /bin/sh
+        - -c
+        - |
+          vault operator init -key-shares=1 -key-threshold=1 -format=json > /vault/data/keys.json
+          vault operator unseal $(jq -r '.unseal_keys_b64[0]' /vault/data/keys.json)
+          vault login $(jq -r '.root_token' /vault/data/keys.json)
+          vault auth enable kubernetes
+          vault write auth/kubernetes/config \
+            token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+            kubernetes_host=https://kubernetes.default.svc \
+            kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          vault policy write cert-manager - <<EOF
+          path "secret/data/cert-manager/*" {
+            capabilities = ["read"]
+          }
+          EOF
+          vault write auth/kubernetes/role/csi-secrets-store \
+            bound_service_account_names=secrets-store-csi-driver \
+            bound_service_account_namespaces=secret-store-csi \
+            policies=cert-manager \
+            ttl=24h
+      restartPolicy: OnFailure
+      volumes:
+      - name: vault-data
+        emptyDir: {}

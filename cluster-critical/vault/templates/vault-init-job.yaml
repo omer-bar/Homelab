@@ -30,23 +30,34 @@ spec:
         - |
           set -e
           
+          # Wait for Vault to be available
           echo "Waiting for Vault to start..."
-          until vault status 2>&1 | grep "Sealed.*true" > /dev/null; do
+          until vault status > /dev/null 2>&1; do
+            echo "Waiting for Vault to be available..."
             sleep 5
           done
           
-          echo "Checking initialization status..."
-          if ! vault status | grep -q "Initialized.*true"; then
+          # Check initialization status
+          if vault status | grep -q "Initialized.*false"; then
             echo "Initializing Vault..."
             vault operator init -key-shares=1 -key-threshold=1 -format=json > /vault/data/init.json
             
-            # Extract unseal key and root token
-            UNSEAL_KEY=$(cat /vault/data/init.json | jq -r '.unseal_keys_b64[0]')
+            # Extract unseal key
+            UNSEAL_KEY=$(grep -o '"unseal_keys_b64":\[[^]]*\]' /vault/data/init.json | grep -o '"[^"]*"' | tail -n1 | tr -d '"')
             
             echo "Unsealing Vault..."
             vault operator unseal $UNSEAL_KEY
+            
+            echo "Initialization and unseal complete"
           else
-            echo "Vault already initialized"
+            echo "Vault is already initialized"
+            
+            # Check if sealed
+            if vault status | grep -q "Sealed.*true"; then
+              echo "Vault is sealed, attempting to unseal..."
+              UNSEAL_KEY=$(grep -o '"unseal_keys_b64":\[[^]]*\]' /vault/data/init.json | grep -o '"[^"]*"' | tail -n1 | tr -d '"')
+              vault operator unseal $UNSEAL_KEY
+            fi
           fi
       volumes:
       - name: vault-data

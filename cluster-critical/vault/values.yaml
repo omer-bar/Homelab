@@ -13,11 +13,11 @@ vault:
       initialDelaySeconds: 30
       periodSeconds: 10
       failureThreshold: 6
-      path: "/v1/sys/health?standbyok=true&sealedok=true"
+      path: "/v1/sys/health?standbyok=true&sealedok=true&initialized=true"  # Allow all states during startup
 
     livenessProbe:
       enabled: true
-      path: "/v1/sys/health?standbyok=true&sealedok=true"
+      path: "/v1/sys/health?standbyok=true&sealedok=true&initialized=true"  # Allow all states during startup
       initialDelaySeconds: 90
       periodSeconds: 30
       failureThreshold: 6
@@ -28,17 +28,22 @@ vault:
         - /bin/sh
         - -c
         - |
-          until vault status > /dev/null 2>&1; do
-            echo "Waiting for vault to start..."
-            sleep 2
+          # Wait for Vault process to be responsive
+          until [ -f /vault/data/init.json ] && vault status > /dev/null 2>&1; do
+            echo "Waiting for Vault to be available..."
+            sleep 5
           done
-          
-          if [ -f /vault/data/init.json ]; then
+
+          # Check seal status
+          if vault status | grep -q "Sealed.*true"; then
+            echo "Vault is sealed, attempting to unseal..."
             UNSEAL_KEY=$(grep -o '"unseal_keys_b64":\[[^]]*\]' /vault/data/init.json | grep -o '"[^"]*"' | tail -n1 | tr -d '"')
             if [ ! -z "$UNSEAL_KEY" ]; then
-              echo "Unsealing vault..."
               vault operator unseal $UNSEAL_KEY
+              echo "Unseal operation completed"
             fi
+          else
+            echo "Vault is already unsealed"
           fi
 
     extraEnvironmentVars:

@@ -8,6 +8,7 @@ argo-cd:
     image:
       repository: quay.io/argoproj/argocd
       tag: ""
+    argocdServerPassword: "$2a$10$yepqP4roumwTgR34fd5iteOO7oYGqjy5WhYIP0QCXKiXPiDldBXmW"
 
   controller:
     replicas: 3
@@ -154,6 +155,7 @@ argo-cd:
       enabled: true
       serviceMonitor:
         enabled: true
+    
 
   repoServer:
     autoscaling:

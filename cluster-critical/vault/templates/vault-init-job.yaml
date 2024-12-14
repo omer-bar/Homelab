@@ -14,7 +14,7 @@ spec:
       serviceAccountName: vault
       containers:
       - name: vault-init
-        image: vault:1.13.3
+        image: vault:1.18.1
         env:
         - name: VAULT_ADDR
           value: "http://vault:8200"
@@ -23,50 +23,40 @@ spec:
         - -c
         - |
           set -e
-          
-          until vault status; do
-            echo "Waiting for Vault to be ready..."
-            sleep 2
+
+          echo "Step 1: Starting Vault initialization script"
+
+          echo "Step 2: Checking Vault readiness..."
+          while true; do
+            if vault status | grep -q "Initialized        true"; then
+              echo "Vault is responding and initialized."
+              break
+            else
+              echo "Waiting for Vault to respond..."
+              sleep 2
+            fi
           done
-          
-          if ! vault operator init -status; then
-            vault operator init -key-shares=1 -key-threshold=1 -format=json > /vault/data/keys.json
-            unseal_key=$(jq -r '.unseal_keys_b64[0]' /vault/data/keys.json)
+
+          echo "Step 3: Verifying if Vault is sealed..."
+          if vault status | grep -q "Sealed             true"; then
+            echo "Vault is sealed. Attempting to unseal..."
+
+            if [ ! -f /vault/data/keys.json ]; then
+              echo "Keys file not found. Initializing Vault..."
+              vault operator init -key-shares=1 -key-threshold=1 -format=json > /vault/data/keys.json
+              echo "Keys file created at /vault/data/keys.json."
+            fi
+
+            unseal_key=$(cat /vault/data/keys.json | grep unseal_keys_b64 | head -1 | awk -F '"' '{print $4}')
             vault operator unseal "$unseal_key"
-            root_token=$(jq -r '.root_token' /vault/data/keys.json)
-            
-            # Enable Kubernetes auth method
-            if ! vault auth list | grep -q "kubernetes/"; then
-              vault auth enable kubernetes
-            fi
-            vault write auth/kubernetes/config \
-              token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
-              kubernetes_host=https://kubernetes.default.svc \
-              kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            
-            # Create "cert-manager" policy
-            if ! vault policy list | grep -q "cert-manager"; then
-              vault policy write cert-manager - <<EOF
-              path "secret/data/cert-manager/*" {
-                capabilities = ["read"]
-              }
-            EOF
-            fi
-            
-            # Create "csi-secrets-store" Kubernetes role
-            if ! vault read auth/kubernetes/role/csi-secrets-store > /dev/null 2>&1; then
-              vault write auth/kubernetes/role/csi-secrets-store \
-                bound_service_account_names=secrets-store-csi-driver \
-                bound_service_account_namespaces=secret-store-csi \
-                policies=cert-manager \
-                ttl=24h
-            fi
-            
-            echo "Vault configuration complete"
+            echo "Vault has been unsealed."
           else
-            echo "Vault is already initialized and unsealed"
+            echo "Vault is already unsealed."
           fi
+
+          echo "Step 4: Script execution completed."
       volumes:
       - name: vault-data
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: vault-data-pvc
       restartPolicy: OnFailure

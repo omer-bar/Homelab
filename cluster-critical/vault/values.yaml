@@ -10,14 +10,35 @@ vault:
 
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 5
-      periodSeconds: 5
+      initialDelaySeconds: 30  # Increased delay
+      periodSeconds: 10
+      failureThreshold: 6
+      path: "/v1/sys/health?standbyok=true&sealedok=true"  # Allow sealed state
 
     livenessProbe:
       enabled: true
-      path: "/v1/sys/health?standbyok=true"
-      initialDelaySeconds: 60
-      periodSeconds: 10
+      path: "/v1/sys/health?standbyok=true&sealedok=true"  # Allow sealed state
+      initialDelaySeconds: 90   # Increased delay
+      periodSeconds: 30
+      failureThreshold: 6
+
+    postStart:
+      command:
+      - /bin/sh
+      - -c
+      - |
+        until vault status > /dev/null 2>&1; do
+          echo "Waiting for vault to start..."
+          sleep 2
+        done
+      
+        if [ -f /vault/data/init.json ]; then
+          UNSEAL_KEY=$(grep -o '"unseal_keys_b64":\[[^]]*\]' /vault/data/init.json | grep -o '"[^"]*"' | tail -n1 | tr -d '"')
+          if [ ! -z "$UNSEAL_KEY" ]; then
+            echo "Unsealing vault..."
+            vault operator unseal $UNSEAL_KEY
+          fi
+        fi
 
     extraEnvironmentVars:
       VAULT_SKIP_VERIFY: "true"

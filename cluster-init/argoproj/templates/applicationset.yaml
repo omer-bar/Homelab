@@ -19,20 +19,20 @@ spec:
             namespace: vault
             wave: "1"
 
-          - name: secret-store-csi-driver
-            path: cluster-critical/secret-store-csi-driver
-            namespace: kube-system
-            wave: "1"
+        #   - name: secret-store-csi-driver
+        #     path: cluster-critical/secret-store-csi-driver
+        #     namespace: kube-system
+        #     wave: "1"
 
-          - name: cert-manager
-            path: cluster-critical/cert-manager
-            namespace: cert-manager
-            wave: "2"
+        #   - name: cert-manager
+        #     path: cluster-critical/cert-manager
+        #     namespace: cert-manager
+        #     wave: "2"
 
-          - name: traefik
-            path: cluster-critical/traefik/traefik
-            namespace: traefik
-            wave: "3"
+        #   - name: traefik
+        #     path: cluster-critical/traefik/traefik
+        #     namespace: traefik
+        #     wave: "3"
 
   template:
     metadata:

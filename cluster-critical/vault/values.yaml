@@ -35,6 +35,8 @@ vault:
         storage "file" {
           path = "/vault/data"
         }
+        default_lease_ttl = "768h"
+        max_lease_ttl = "768h"
 
     resources:
       requests:
@@ -54,6 +56,13 @@ vault:
                 app.kubernetes.io/name: vault
             topologyKey: kubernetes.io/hostname
 
+    # Add the required storage configuration
+    dataStorage:
+      enabled: true
+      size: "10Gi"
+      storageClass: "local-path"
+      accessMode: ReadWriteOnce
+
   auth:
     kubernetes:
       enabled: true
@@ -68,17 +77,6 @@ vault:
         path "secret/data/cert-manager/*" {
           capabilities = ["read"]
         }
-
-  dataStorage:
-    enabled: true
-    size: "10Gi"
-    storageClass: "local-path"
-    accessMode: ReadWriteOnce
-
-  ui:
-    enabled: true
-    serviceType: ClusterIP
-    externalPort: 8200
 
   csi:
     enabled: true

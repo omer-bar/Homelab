@@ -16,7 +16,8 @@ spec:
       serviceAccountName: vault
       containers:
       - name: vault-init
-        image: vault:1.18.1
+        image: "hashicorp/vault:1.18.1"
+        imagePullPolicy: IfNotPresent
         env:
         - name: VAULT_ADDR
           value: "http://vault:8200"
@@ -26,12 +27,13 @@ spec:
         - |
           set -e
 
-          echo "Step 1: Starting Vault initialization script"
+          echo "Step 1: Ensuring directory for keys exists..."
+          mkdir -p /vault/data
 
-          echo "Step 2: Checking Vault readiness..."
+          echo "Step 2: Waiting for Vault to become responsive..."
           while true; do
-            if vault status | grep -q "Initialized        true"; then
-              echo "Vault is responding and initialized."
+            if vault status > /dev/null 2>&1; then
+              echo "Vault is responding."
               break
             else
               echo "Waiting for Vault to respond..."
@@ -39,26 +41,18 @@ spec:
             fi
           done
 
-          echo "Step 3: Verifying if Vault is sealed..."
-          if vault status | grep -q "Sealed             true"; then
-            echo "Vault is sealed. Attempting to unseal..."
-
-            if [ ! -f /vault/data/keys.json ]; then
-              echo "Keys file not found. Initializing Vault..."
-              vault operator init -key-shares=1 -key-threshold=1 -format=json > /vault/data/keys.json
-              echo "Keys file created at /vault/data/keys.json."
-            fi
-
-            unseal_key=$(cat /vault/data/keys.json | grep unseal_keys_b64 | head -1 | awk -F '"' '{print $4}')
-            vault operator unseal "$unseal_key"
-            echo "Vault has been unsealed."
+          echo "Step 3: Checking if Vault is initialized..."
+          if vault status | grep -q "Initialized        false"; then
+            echo "Vault is not initialized. Initializing now..."
+            vault operator init -key-shares=1 -key-threshold=1 -format=json > /vault/data/keys.json
+            echo "Vault initialized successfully. Keys saved to /vault/data/keys.json."
           else
-            echo "Vault is already unsealed."
+            echo "Vault is already initialized."
           fi
 
           echo "Step 4: Script execution completed."
       volumes:
       - name: vault-data
         persistentVolumeClaim:
-          claimName: vault-data-pvc
+          claimName: data-vault-0
       restartPolicy: OnFailure

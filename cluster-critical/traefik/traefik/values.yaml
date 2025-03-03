@@ -4,7 +4,7 @@ traefik:
   fullnameOverride: traefik
   image:
     repository: traefik
-    tag: 3.2.0
+    tag: v3.3.4
   deployment:
     annotations:
       reloader.stakater.com/match: "true"

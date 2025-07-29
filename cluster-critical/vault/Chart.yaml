@@ -3,7 +3,7 @@ apiVersion: v2
 version: 1.0.1
 dependencies:
   - name: vault
-    version: 0.29.1
+    version: 0.30.1
     repository: https://helm.releases.hashicorp.com
   - name: cluster-common
     version: "0.1.0"

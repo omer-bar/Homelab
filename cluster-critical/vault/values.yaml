@@ -5,7 +5,7 @@ vault:
     enabled: true
     image:
       repository: "hashicorp/vault"
-      tag: "1.18.5"
+      tag: "1.20.2"
       pullPolicy: IfNotPresent
 
     readinessProbe:

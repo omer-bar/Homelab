@@ -3,7 +3,7 @@ apiVersion: v2
 version: 1.0.0
 dependencies:
   - name: traefik
-    version: 34.4.0
+    version: 34.4.1
     repository: https://helm.traefik.io/traefik
   - name: cluster-common
     version: "0.1.0"
